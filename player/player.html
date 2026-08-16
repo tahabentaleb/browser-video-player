@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Browser Video Player</title>
+  <link rel="stylesheet" href="player.css">
+</head>
+<body>
+  <div id="app">
+    <header id="topbar">
+      <div class="brand">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="1.5" y="1.5" width="21" height="21" rx="6" fill="#2b6fff"/><path d="M9.5 7.8v8.4L16.6 12z" fill="#fff"/></svg>
+        Browser Video Player
+      </div>
+      <div id="videoTitle" class="title"></div>
+      <div id="sourceNote" class="note"></div>
+    </header>
+
+    <main id="stage">
+      <!-- ============ PLAYER ============ -->
+      <div id="player" class="hidden">
+        <video id="video" playsinline preload="auto"></video>
+        <iframe id="embedFrame" class="hidden" allow="autoplay; fullscreen; picture-in-picture; encrypted-media" referrerpolicy="no-referrer-when-downgrade" frameborder="0"></iframe>
+
+        <!-- center layers -->
+        <div id="spinner" class="center-layer hidden"><div class="ring"></div></div>
+        <div id="bigPlay" class="center-layer hidden">
+          <button id="bigPlayBtn" aria-label="Play">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+          </button>
+        </div>
+
+        <div id="errorBox" class="modal hidden">
+          <div class="modal-card">
+            <svg class="err-ico" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2 1 21h22L12 2zm1 14h-2v2h2v-2zm0-8h-2v6h2V8z"/></svg>
+            <h2>Unable to play this video</h2>
+            <p id="errorDetail">The video source may not be supported inside the extension player.</p>
+            <p id="errorHint" class="hint"></p>
+            <div class="actions">
+              <button id="btnRetry" class="btn">Retry</button>
+              <button id="btnPopout" class="btn ghost">Pop-out Player Window</button>
+              <button id="btnLoadOther" class="btn ghost">Load a different URL</button>
+              <a id="errorSrcLink" class="btn ghost hidden" target="_blank" rel="noopener">Open source URL</a>
+            </div>
+          </div>
+        </div>
+
+        <div id="endedBox" class="modal hidden">
+          <div class="modal-card">
+            <h2>Playback finished</h2>
+            <div class="actions">
+              <button id="btnReplay" class="btn">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg>
+                Replay
+              </button>
+              <button id="btnEndedNext" class="btn ghost hidden">Next video ›</button>
+            </div>
+          </div>
+        </div>
+
+        <div id="toast" role="status"></div>
+
+        <!-- ============ CONTROLS ============ -->
+        <div id="controls">
+          <div id="progress" role="slider" tabindex="0" aria-label="Seek bar"
+               aria-valuemin="0" aria-valuemax="0" aria-valuenow="0">
+            <div id="rail">
+              <div id="bufferedBar"></div>
+              <div id="playedBar"></div>
+            </div>
+            <div id="scrubHandle"></div>
+            <div id="seekTip" class="hidden">0:00</div>
+          </div>
+
+          <div class="ctrl-row">
+            <div class="cluster">
+              <button id="btnPlay" class="ctl" title="Play / pause (space)" aria-label="Play or pause">
+                <svg id="icoPlay" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                <svg id="icoPause" class="hidden" viewBox="0 0 24 24" fill="currentColor"><path d="M7 5h4v14H7zM13 5h4v14h-4z"/></svg>
+              </button>
+              <button id="btnBack10" class="ctl" title="Back 10 seconds" aria-label="Back 10 seconds">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/><text x="8.6" y="15.8" font-size="6.2" font-weight="700">10</text></svg>
+              </button>
+              <button id="btnFwd10" class="ctl" title="Forward 10 seconds" aria-label="Forward 10 seconds">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 5V1l5 5-5 5V7c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6h2c0 4.42-3.58 8-8 8s-8-3.58-8-8 3.58-8 8-8z"/><text x="8.6" y="15.8" font-size="6.2" font-weight="700">10</text></svg>
+              </button>
+              <button id="btnPrev" class="ctl" title="Previous video" aria-label="Previous video">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h2v12H6zm3.5 6L18 6v12z"/></svg>
+              </button>
+              <button id="btnNext" class="ctl" title="Next video" aria-label="Next video">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 6h2v12h-2zM6 6l8.5 6L6 18z"/></svg>
+              </button>
+              <div class="time"><span id="tCur">0:00</span><span class="sep">/</span><span id="tDur">0:00</span></div>
+            </div>
+
+            <div class="cluster">
+              <div id="volumeWrap">
+                <button id="btnMute" class="ctl" title="Mute (m)" aria-label="Mute or unmute">
+                  <svg id="icoVol" viewBox="0 0 24 24" fill="currentColor"><path d="M3 10v4h4l5 5V5L7 10H3zm13.5 2c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+                  <svg id="icoMuted" class="hidden" viewBox="0 0 24 24" fill="currentColor"><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3 3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4 9.91 6.09 12 8.18V4z"/></svg>
+                </button>
+                <input id="volume" type="range" min="0" max="1" step="0.02" value="1" aria-label="Volume">
+              </div>
+
+              <div id="speedWrap">
+                <button id="btnSpeed" class="ctl text" title="Playback speed" aria-haspopup="menu">1x</button>
+                <div id="speedMenu" class="menu hidden" role="menu"></div>
+              </div>
+
+              <button id="btnPip" class="ctl" title="Picture-in-picture (p)" aria-label="Picture in picture">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 11h-8v6h8v-6zm4 8V4.98C23 3.88 22.1 3 21 3H3c-1.1 0-2 .88-2 1.98V19c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2zm-2 .02H3V4.97h18v14.05z"/></svg>
+              </button>
+              <button id="btnTheater" class="ctl" title="Theater mode (t)" aria-label="Theater mode">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="7" width="18" height="10" rx="1.5"/></svg>
+              </button>
+              <button id="btnFull" class="ctl" title="Fullscreen (f)" aria-label="Fullscreen">
+                <svg id="icoFull" viewBox="0 0 24 24" fill="currentColor"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+                <svg id="icoExitFull" class="hidden" viewBox="0 0 24 24" fill="currentColor"><path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ EMPTY STATE / DIRECT LOAD ============ -->
+      <div id="directLoad">
+        <h1>No video handed over</h1>
+        <p class="dim">Open a page with a video and click the floating <strong>▶ Open in Player</strong> button,
+        or use the extension popup. You can also paste a direct video URL below:</p>
+        <div class="direct-row">
+          <input id="directUrl" type="url" placeholder="https://example.com/video.mp4" spellcheck="false">
+          <button id="directGo" class="btn">Load</button>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="../shared/util.js"></script>
+  <script src="hls.min.js"></script>
+  <script src="player.js"></script>
+</body>
+</html>

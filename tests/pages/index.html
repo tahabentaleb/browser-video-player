@@ -1,0 +1,14 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><title>BVP test hub</title>
+<style>body{font-family:system-ui;background:#0f1115;color:#e8eaee;margin:3rem auto;max-width:640px;padding:0 1rem}
+a{color:#5b96ff}li{margin:.6rem 0}code{background:#1c2027;padding:2px 6px;border-radius:6px}</style></head>
+<body><h1>Browser Video Player — test pages</h1>
+<p>Serve this folder over HTTP (content scripts don't run on <code>file://</code> unless enabled):</p>
+<pre><code>python3 -m http.server 8000 --directory tests/pages</code></pre>
+<ol>
+<li><a href="basic.html">basic.html</a> — single paused video</li>
+<li><a href="multi.html">multi.html</a> — 3 videos incl. tiny playing preview</li>
+<li><a href="dynamic.html">dynamic.html</a> — video appears after 10 s</li>
+<li><a href="unsupported.html">unsupported.html</a> — broken + MSE sources</li>
+</ol>
+<p>Requires internet: fixtures use Google's public sample videos.</p>
+</body></html>

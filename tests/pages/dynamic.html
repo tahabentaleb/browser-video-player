@@ -1,0 +1,19 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><title>BVP — dynamic video</title>
+<style>body{font-family:system-ui;background:#111;color:#eee;margin:2rem}</style></head>
+<body><h1>Dynamic insertion</h1>
+<p>A video is injected automatically after 10 s (or use the button). Expect: button appears without reload.</p>
+<button id="add">Insert video now</button>
+<div id="slot"></div>
+<script>
+function addVideo() {
+  if (document.querySelector('#slot video')) return;
+  const v = document.createElement('video');
+  v.controls = true; v.preload = 'metadata';
+  v.style.width = 'min(640px,90vw)';
+  v.src = 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4';
+  document.getElementById('slot').appendChild(v);
+}
+document.getElementById('add').addEventListener('click', addVideo);
+setTimeout(addVideo, 10000);
+</script>
+</body></html>

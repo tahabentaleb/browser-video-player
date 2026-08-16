@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <header>
+    <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="1.5" y="1.5" width="21" height="21" rx="6" fill="#2b6fff"/><path d="M9.5 7.8v8.4L16.6 12z" fill="#fff"/></svg>
+    <div class="head-text">
+      <h1>Browser Video Player</h1>
+      <div id="pageMeta" class="meta">Checking current tab…</div>
+    </div>
+  </header>
+
+  <main>
+    <div id="stateLoading" class="state"><div class="spinner"></div>Scanning page…</div>
+
+    <div id="stateNone" class="state hidden">
+      <span class="dot gray"></span>
+      <p>No playable video detected on this page.</p>
+    </div>
+
+    <div id="stateUnavailable" class="state hidden">
+      <p>Can&rsquo;t scan this page.<br><span class="dim">Chrome restricts extensions on browser, Web Store and PDF pages. If the page is still loading, try again.</span></p>
+    </div>
+
+    <div id="stateList" class="hidden">
+      <div id="videoCount" class="count"></div>
+      <div id="videoRows"></div>
+    </div>
+  </main>
+
+  <footer>
+    <button id="openBest" class="primary hidden">▶&nbsp; Open Player</button>
+  </footer>
+
+  <script src="../shared/util.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>

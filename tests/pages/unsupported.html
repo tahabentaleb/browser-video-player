@@ -1,0 +1,7 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><title>BVP — unsupported sources</title>
+<style>body{font-family:system-ui;background:#111;color:#eee;margin:2rem}video{width:min(560px,92vw);display:block;margin-top:1rem}</style></head>
+<body><h1>Unsupported / broken sources</h1>
+<p>1) Broken URL — expect the player's error card with a useful message (no blank UI).</p>
+<video controls preload="metadata" src="https://example.com/definitely-not-a-video.mp4"></video>
+<p>2) MSE/DRM check: open <a style="color:#5b96ff" href="https://www.youtube.com">YouTube</a>, click Open in Player on a video — expect the honest "stream cannot be replayed outside the original page" error, because YouTube serves <code>blob:</code> MediaSource streams.</p>
+</body></html>

@@ -1,0 +1,37 @@
+{
+  "manifest_version": 3,
+  "name": "Browser Video Player",
+  "version": "1.0.0",
+  "description": "Detects <video> elements on any page and opens them in a dedicated player with modern controls.",
+  "minimum_chrome_version": "102",
+  "permissions": [
+    "storage",
+    "declarativeNetRequest",
+    "declarativeNetRequestWithHostAccess"
+  ],
+  "host_permissions": [
+    "http://*/*",
+    "https://*/*"
+  ],
+  "background": {
+    "service_worker": "background/service-worker.js"
+  },
+  "action": {
+    "default_popup": "popup/popup.html",
+    "default_title": "Browser Video Player"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "http://*/*",
+        "https://*/*",
+        "file://*/*"
+      ],
+      "js": [
+        "content/detector.js"
+      ],
+      "run_at": "document_start",
+      "all_frames": true
+    }
+  ]
+}
